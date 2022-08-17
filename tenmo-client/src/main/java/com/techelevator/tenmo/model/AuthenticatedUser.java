@@ -1,9 +1,12 @@
 package com.techelevator.tenmo.model;
 
+import java.math.BigDecimal;
+
 public class AuthenticatedUser {
 	
 	private String token;
 	private User user;
+
 	
 	public String getToken() {
 		return token;

@@ -83,7 +83,6 @@ public class AuthenticationController {
 		public void setUser(User user) {
 			this.user = user;
 		}
-        //Test comment
     }
 }
 
