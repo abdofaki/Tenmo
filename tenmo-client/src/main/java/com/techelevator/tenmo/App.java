@@ -16,9 +16,10 @@ public class App {
 
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
+    private final UserServices userService = new UserServices(API_BASE_URL);
 
     private AuthenticatedUser currentUser;
-    private UserServices userservices = new UserServices();
+
 
     public static void main(String[] args) {
         App app = new App();
@@ -63,6 +64,8 @@ public class App {
         currentUser = authenticationService.login(credentials);
         if (currentUser == null) {
             consoleService.printErrorMessage();
+        } else {
+            userService.setAuthToken(currentUser.getToken());
         }
     }
 
@@ -92,7 +95,7 @@ public class App {
 
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
-        BigDecimal balance = userservices.getBalance(currentUser);
+        BigDecimal balance = userService.getBalance(currentUser);
         System.out.println(balance);
 		
 	}
