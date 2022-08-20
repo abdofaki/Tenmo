@@ -24,22 +24,17 @@ public class JdbcTransferDao implements TransferDao{
     public void transfer(Transfer transfer) {
         boolean approved = transfer.getTransferStatusId() == 2;
         AccountDao accountDao = new JdbcAccountDao(jdbcTemplate);
-
         int fromAccountId = transfer.getAccountFrom();
         int toAccountId = transfer.getAccountTo();
-
-        Account fromAccount = accountDao.getAccountWithUserId((long)fromAccountId);
-        Account toAccount = accountDao.getAccountWithUserId((long)fromAccountId);
-
+        Account fromAccount = accountDao.getAccountWithAccountId((long) fromAccountId);
+        Account toAccount = accountDao.getAccountWithAccountId((long) toAccountId);
         BigDecimal fromAccountBalance = fromAccount.getBalance().getBalance();
         BigDecimal toAccountBalance = toAccount.getBalance().getBalance();
-
         BigDecimal transferAmount = transfer.getAmount();
-
-                if (approved) {
-                    fromAccountBalance = fromAccountBalance.subtract(transferAmount);
-                    toAccountBalance = toAccountBalance.add(transferAmount);
-                }
+        if (approved) {
+            fromAccountBalance = fromAccountBalance.subtract(transferAmount);
+            toAccountBalance = toAccountBalance.add(transferAmount);
+        }
         String sql = "START TRANSACTION; " +
                 "UPDATE account " +
                 "SET balance = ? " +
