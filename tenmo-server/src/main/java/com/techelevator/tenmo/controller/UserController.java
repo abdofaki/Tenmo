@@ -1,7 +1,9 @@
 package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.JdbcUserDao;
+import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.dao.UserDao;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -24,9 +26,16 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserDao user;
+    @Autowired
+    private TransferDao transfer;
 
     @RequestMapping(path = "/balance", method = RequestMethod.GET)
     public BigDecimal getBalance(Principal principal) {
         return user.getBalance(principal.getName());
     }
+    @RequestMapping(path = "/transfers", method = RequestMethod.GET)
+    public List<Transfer> getAllTransfer(Principal principal){
+        return transfer.listAllTransfers(principal.getName());
+    }
+
 }

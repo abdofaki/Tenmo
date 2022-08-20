@@ -1,6 +1,7 @@
 package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class App {
 
@@ -102,6 +104,14 @@ public class App {
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
+        List<Transfer> transferList = userService.getAllTransfers(currentUser);
+        if (transferList != null) {
+            for (Transfer transfer : transferList) {
+                System.out.println(transfer.toString());
+            }
+        } else{
+            System.out.println("No Transfer History");
+        }
 		
 	}
 

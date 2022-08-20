@@ -8,6 +8,7 @@ public class Transfer {
     private Long toId;
     private BigDecimal transferAmount;
 
+
     public Long getId() {
         return id;
     }
@@ -32,11 +33,11 @@ public class Transfer {
         this.toId = toId;
     }
 
-    public BigDecimal getTransferAmout() {
+    public BigDecimal getTransferAmount() {
         return transferAmount;
     }
 
-    public void setTransferAmout(BigDecimal transferAmout) {
-        this.transferAmount = transferAmout;
+    public void setTransferAmount(BigDecimal transferAmount) {
+        this.transferAmount = transferAmount;
     }
 }

@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
@@ -9,6 +10,8 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserServices {
     public final String API_BASE_URL;
@@ -30,7 +33,18 @@ public class UserServices {
         }
         return balance;
     };
-    private HttpEntity<User> makeAuctionEntity(User user) {
+    public List<Transfer> getAllTransfers(AuthenticatedUser currentUser){
+        List transferList = new ArrayList<>();
+        try {
+            ResponseEntity<List> response =
+                    restTemplate.exchange(API_BASE_URL + "/user/transfers", HttpMethod.GET, makeAuthEntity(currentUser), List.class);
+            transferList = response.getBody();
+        }catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return transferList;
+    }
+    private HttpEntity<User> makeUserEntity(User user) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(authToken);
