@@ -1,39 +1,73 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class JdbcTransferDao implements TransferDao{
+
+
     private JdbcTemplate jdbcTemplate;
+
     public JdbcTransferDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public List<Transfer> listAllTransfers(String userName){
-        List<Transfer> transferList = new ArrayList<>();
-        String sql = "SELECT * FROM transfer WHERE account_from = (SELECT account_id FROM account " +
-                "WHERE user_id = (SELECT account_id FROM account WHERE user_id = (SELECT user_id FROM user WHERE user_name = ?) " +
-                "OR account_to = (SELECT account_id FROM account WHERE user_id = (SELECT user_id FROM user WHERE user_name = ?))";
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, userName, userName);
-        while (rs.next()){
-            transferList.add(mapRowToTransfer(rs));
-        }
-        return transferList;
-    }
+    public void transfer(Transfer transfer) {
+        boolean approved = transfer.getTransferStatusId() == 2;
+        AccountDao accountDao = new JdbcAccountDao(jdbcTemplate);
 
-    private Transfer mapRowToTransfer(SqlRowSet rs){
+        int fromAccountId = transfer.getAccountFrom();
+        int toAccountId = transfer.getAccountTo();
+
+        Account fromAccount = accountDao.getAccountWithUserId((long)fromAccountId);
+        Account toAccount = accountDao.getAccountWithUserId((long)fromAccountId);
+
+        BigDecimal fromAccountBalance = fromAccount.getBalance().getBalance();
+        BigDecimal toAccountBalance = toAccount.getBalance().getBalance();
+
+        BigDecimal transferAmount = transfer.getAmount();
+
+                if (approved) {
+                    fromAccountBalance = fromAccountBalance.subtract(transferAmount);
+                    toAccountBalance = toAccountBalance.add(transferAmount);
+                }
+        String sql = "START TRANSACTION; " +
+                "UPDATE account " +
+                "SET balance = ? " +
+                "WHERE account_id = ?; " +
+                "UPDATE account " +
+                "SET balance = ? " +
+                "WHERE account_id = ?; " +
+                "INSERT INTO transfer (transfer_type_id, transfer_status_id,account_from, account_to, amount) " +
+                " VALUES (?, ?, ?, ?, ?);" +
+                "COMMIT;";
+
+        jdbcTemplate.update(sql, fromAccountBalance, fromAccountId, toAccountBalance, toAccountId,
+                transfer.getTransferTypeId(), transfer.getTransferStatusId(), fromAccountId, toAccountId, transferAmount);
+   }
+
+
+
+
+    private Transfer mapRowToTransfer(SqlRowSet results) {
+
         Transfer transfer = new Transfer();
-        transfer.setId(rs.getLong("transfer_id"));
-        transfer.setFromId(rs.getLong("account_from"));
-        transfer.setToId(rs.getLong("account_to"));
-        transfer.setTransferAmount(rs.getBigDecimal("amount"));
+        transfer.setTransferId(results.getInt("transfer_id"));
+        transfer.setTransferTypeId(results.getInt("transfer_type_id"));
+        transfer.setTransferStatusId(results.getInt("transfer_status_id"));
+        transfer.setAccountFrom(results.getInt("account_from"));
+        transfer.setAccountTo(results.getInt("account_to"));
+        String stringAmount = results.getString("amount");
+        transfer.setAmount(new BigDecimal(stringAmount));
         return transfer;
     }
 }

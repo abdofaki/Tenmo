@@ -29,13 +29,13 @@ public class UserController {
     @Autowired
     private TransferDao transfer;
 
-    @RequestMapping(path = "/balance", method = RequestMethod.GET)
-    public BigDecimal getBalance(Principal principal) {
-        return user.getBalance(principal.getName());
-    }
-    @RequestMapping(path = "/transfers", method = RequestMethod.GET)
-    public List<Transfer> getAllTransfer(Principal principal){
-        return transfer.listAllTransfers(principal.getName());
-    }
+//    @RequestMapping(path = "/balance", method = RequestMethod.GET)
+//    public BigDecimal getBalance(Principal principal) {
+//        return user.getBalance(principal.getName());
+//    }
+//    @RequestMapping(path = "/transfers", method = RequestMethod.GET)
+//    public List<Transfer> getAllTransfer(Principal principal){
+//        return transfer.listAllTransfers(principal.getName());
+//    }
 
 }
