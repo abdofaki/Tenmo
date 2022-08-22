@@ -5,8 +5,10 @@ import com.techelevator.tenmo.model.Transfer;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +20,17 @@ public class JdbcTransferDao implements TransferDao{
 
     public JdbcTransferDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public List<Transfer> getTransferByAccount(Account account){
+        List<Transfer> transferList = new ArrayList<>();
+        String sql = "Select * FROM transfer WHERE to_account = ? OR from_account = ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, account.getAccountId(), account.getAccountId());
+        while (results.next()){
+            transferList.add(mapRowToTransfer(results));
+        }
+        return transferList;
     }
 
     @Override

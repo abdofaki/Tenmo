@@ -106,7 +106,7 @@ public class App {
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
-        List<Transfer> transferList = userService.getAllTransfers(currentUser);
+        Transfer[] transferList = tenmoServices.getTransferHistory(currentUser);
         if (transferList != null) {
             for (Transfer transfer : transferList) {
                 System.out.println(transfer.toString());

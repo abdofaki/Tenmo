@@ -7,6 +7,9 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TenmoServices {
 
     private final String baseUrl = "http://localhost:8080/tenmo";
@@ -61,6 +64,16 @@ public class TenmoServices {
             BasicLogger.log(e.getMessage());
         }
         return account;
+    }
+    public Transfer[] getTransferHistory(AuthenticatedUser authenticatedUser){
+        Transfer[] transferList = null;
+        try {
+            ResponseEntity<Transfer[]> response = restTemplate.exchange(baseUrl + "/review_transfers", HttpMethod.GET, makeAuthEntity(authenticatedUser), Transfer[].class);
+            transferList = response.getBody();
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return transferList;
     }
 
 

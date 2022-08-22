@@ -9,3 +9,5 @@
 2022-08-20T11:02:56.73779 500 : [{"timestamp":"2022-08-20T18:02:56.713+00:00","status":500,"error":"Internal Server Error","message":"Cannot invoke \"com.techelevator.tenmo.model.Balance.getBalance()\" because the return value of \"com.techelevator.tenmo.model.Account.getBalance()\" is null","path":"/tenmo/transfer"}]
 2022-08-20T11:47:11.937474 500 : [{"timestamp":"2022-08-20T18:47:11.911+00:00","status":500,"error":"Internal Server Error","message":"Cannot invoke \"com.techelevator.tenmo.model.Balance.getBalance()\" because the return value of \"com.techelevator.tenmo.model.Account.getBalance()\" is null","path":"/tenmo/transfer"}]
 2022-08-20T11:52:24.606492 500 : [{"timestamp":"2022-08-20T18:52:24.587+00:00","status":500,"error":"Internal Server Error","message":"Cannot invoke \"com.techelevator.tenmo.model.Balance.getBalance()\" because the return value of \"com.techelevator.tenmo.model.Account.getBalance()\" is null","path":"/tenmo/transfer"}]
+2022-08-20T19:38:23.7828342 401 : [no body]
+2022-08-20T19:38:45.9232148 401 : [no body]

@@ -47,4 +47,9 @@ public class TenmoController {
         transferDao.transfer(transfer);
     }
 
+    @RequestMapping(path = "/review_transfers", method = RequestMethod.GET)
+    public List<Transfer> viewTransfers(Principal principal){
+        return transferDao.getTransferByAccount(accountDao.getAccountWithUserId(userDao.findIdByUsername(principal.getName())));
+    }
+
 }
