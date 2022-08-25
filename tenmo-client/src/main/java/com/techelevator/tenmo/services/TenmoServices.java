@@ -68,12 +68,23 @@ public class TenmoServices {
     public Transfer[] getTransferHistory(AuthenticatedUser authenticatedUser){
         Transfer[] transferList = null;
         try {
-            ResponseEntity<Transfer[]> response = restTemplate.exchange(baseUrl + "/review_transfers", HttpMethod.GET, makeAuthEntity(authenticatedUser), Transfer[].class);
+            ResponseEntity<Transfer[]> response = restTemplate.exchange(baseUrl + "/transfers", HttpMethod.GET, makeAuthEntity(authenticatedUser), Transfer[].class);
             transferList = response.getBody();
         } catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());
         }
         return transferList;
+    }
+    public Transfer getTransferById(AuthenticatedUser authenticatedUser, int transferId){
+        Transfer transfer = null;
+        try {
+            ResponseEntity<Transfer> response = restTemplate.exchange(baseUrl +"/transfers/" + transferId, HttpMethod.GET, makeAuthEntity(authenticatedUser), Transfer.class);
+            transfer = response.getBody();
+
+        }catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return transfer;
     }
 
 

@@ -41,15 +41,18 @@ public class TenmoController {
         return accountDao.getAccountWithUserId(id);
     }
 
-    //@ResponseStatus(HttpStatus.CREATED)
+
     @RequestMapping(path = "/transfer", method = RequestMethod.POST)
     public void transfer(@RequestBody Transfer transfer) {
         transferDao.transfer(transfer);
     }
 
-    @RequestMapping(path = "/review_transfers", method = RequestMethod.GET)
-    public List<Transfer> viewTransfers(Principal principal){
-        return transferDao.getTransferByAccount(accountDao.getAccountWithUserId(userDao.findIdByUsername(principal.getName())));
+    @RequestMapping(path = "/transfers/{id}", method = RequestMethod.GET)
+    public Transfer viewTransferByID(@PathVariable long id){
+        return transferDao.getTransferByID(id);
+    }
+    @RequestMapping(path = "/transfers", method = RequestMethod.GET)
+    public List<Transfer> viewTransferHistory(){return transferDao.getTransferByAccount();
     }
 
 }

@@ -111,9 +111,22 @@ public class App {
             for (Transfer transfer : transferList) {
                 System.out.println(transfer.toString());
             }
+            int userInput =  consoleService.promptForInt("Enter the ID of the transfer you'd like to view: (enter 0 to cancel): ");
+            while (userInput != 0){
+                Transfer transfer = tenmoServices.getTransferById(currentUser, userInput);
+                if (transfer != null){
+                    System.out.println(transfer);
+                    break;
+                }
+                else{
+                    userInput = consoleService.promptForInt("Invalid ID\n " +
+                            "Please enter the VALID ID of the transfer you'd like to view: (enter 0 to cancel): ");
+                }
+            }
         } else{
             System.out.println("No Transfer History");
         }
+
 
 
         
