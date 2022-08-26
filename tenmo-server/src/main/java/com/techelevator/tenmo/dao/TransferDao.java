@@ -11,6 +11,7 @@ public interface TransferDao {
     void transfer (Transfer transfer);
     Transfer getTransferByID(Long transferId);
     List<Transfer> getTransferByAccount(Long accountId);
+    List<Transfer> getPendingRequestByAccount(Long accountId);
 
 
 

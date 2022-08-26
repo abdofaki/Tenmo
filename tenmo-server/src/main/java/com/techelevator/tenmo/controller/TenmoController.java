@@ -43,6 +43,7 @@ public class TenmoController {
 
     @RequestMapping(path = "/account/{id}", method = RequestMethod.GET)
     public Account getAccountByAccountId(@PathVariable long id) {
+
         return accountDao.getAccountWithAccountId(id);
     }
 
@@ -64,6 +65,10 @@ public class TenmoController {
     @RequestMapping(path = "/transfers/history/{id}", method = RequestMethod.GET)
     public List<Transfer> viewTransferHistory(@PathVariable("id") Long accountId){
         return transferDao.getTransferByAccount(accountId);
+    }
+    @RequestMapping(path = "/pending/{id}", method = RequestMethod.GET)
+    public List<Transfer> getPendingTransfers(@PathVariable("id") Long accountId){
+        return transferDao.getPendingRequestByAccount(accountId);
     }
 
     @RequestMapping(path = "/request", method = RequestMethod.POST)

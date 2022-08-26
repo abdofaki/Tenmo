@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class JdbcTransferDao implements TransferDao{
+public class JdbcTransferDao implements TransferDao {
 
 
     private JdbcTemplate jdbcTemplate;
@@ -23,21 +23,38 @@ public class JdbcTransferDao implements TransferDao{
     }
 
     @Override
-    public List<Transfer> getTransferByAccount(Long accountId){
+    public List<Transfer> getTransferByAccount(Long accountId) {
         List<Transfer> transferList = new ArrayList<>();
         String sql =
                 "SELECT transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount " +
                         " FROM transfer " +
                         " WHERE account_from = ? " +
                         " OR account_to = ?;";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql,accountId,accountId);
-        while (results.next()){
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId, accountId);
+        while (results.next()) {
             transferList.add(mapRowToTransfer(results));
         }
         return transferList;
     }
+
     @Override
-    public Transfer getTransferByID(Long transferId){
+    public List<Transfer> getPendingRequestByAccount(Long accountId) {
+        List<Transfer> pendingTransfers = new ArrayList<>();
+        String sql =
+                "SELECT transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount " +
+                        "FROM transfer " +
+                        "WHERE account_to = ? " +
+                        "AND transfer_status_id = 1";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
+        while (results.next()) {
+            pendingTransfers.add(mapRowToTransfer(results));
+        }
+        return pendingTransfers;
+    }
+
+
+    @Override
+    public Transfer getTransferByID(Long transferId) {
         Transfer transfer = null;
         String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount " +
                 " FROM transfer " +
@@ -47,7 +64,10 @@ public class JdbcTransferDao implements TransferDao{
             transfer = mapRowToTransfer(results);
         }
         return transfer;
-    };
+    }
+
+    ;
+
     @Override
     public void transfer(Transfer transfer) {
         boolean approved = transfer.getTransferStatusId() == 2;
@@ -76,7 +96,7 @@ public class JdbcTransferDao implements TransferDao{
 
         jdbcTemplate.update(sql, fromAccountBalance, fromAccountId, toAccountBalance, toAccountId,
                 transfer.getTransferTypeId(), transfer.getTransferStatusId(), fromAccountId, toAccountId, transferAmount);
-   }
+    }
 
     @Override
     public void request(Transfer transfer) {
@@ -88,8 +108,8 @@ public class JdbcTransferDao implements TransferDao{
         int toAccountId = transfer.getAccountTo();
         Account fromAccount = accountDao.getAccountWithAccountId((long) fromAccountId);
         Account toAccount = accountDao.getAccountWithAccountId((long) toAccountId);
-        fromAccountId = fromAccount.getAccountId();
-        toAccountId = toAccount.getAccountId();
+        fromAccountId = (int) fromAccount.getAccountId();
+        toAccountId = (int) toAccount.getAccountId();
 
         BigDecimal requestAmount = transfer.getAmount();
 
@@ -100,10 +120,6 @@ public class JdbcTransferDao implements TransferDao{
 
         jdbcTemplate.update(sql, transferTypeId, transferStatusId, fromAccountId, toAccountId, requestAmount);
     }
-
-
-
-
 
 
     private Transfer mapRowToTransfer(SqlRowSet results) {

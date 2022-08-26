@@ -11,6 +11,18 @@ import java.util.List;
 
 public class App {
 
+    public enum TransferType{
+        Request,
+        Send
+    }
+
+    public enum TransferStatus{
+        Pending,
+        Approved,
+        Rejected
+    }
+
+
     private static final String API_BASE_URL = "http://localhost:8080/";
 
     private final ConsoleService consoleService = new ConsoleService();
@@ -157,7 +169,27 @@ public class App {
 
     private void viewPendingRequests() {
         // TODO Auto-generated method stub
+        Account userAccount = tenmoServices.getAccountByUserId(currentUser, currentUser.getUser().getId());
+        int userAccountId = userAccount.getAccountId();
+        Transfer [] pendingTransfers = tenmoServices.getPendingTransfers(currentUser,userAccountId);
 
+        if(pendingTransfers != null){
+            System.out.println("-------------------------------------------\n" +
+                    "Pending Transfers\n" +
+                    "ID          To                     Amount\n" +
+                    "-------------------------------------------");
+            for (Transfer pending : pendingTransfers) {
+
+                String userName = tenmoServices.getUserByUserId(currentUser,
+                        tenmoServices.getAccountByAccountId(currentUser, pending.getAccountFrom()).getUserId()).getUsername();
+                System.out.println( pending.getTransferId() + "\t\t" + userName + "\t\t" + pending.getAmount());
+            }
+
+            System.out.println("---------\n" +
+                    "Please enter transfer ID to approve/reject (0 to cancel): \"");
+        }else{
+            System.out.println("No Pending Transfer History");
+        }
     }
 
     private void sendBucks() {
@@ -252,7 +284,6 @@ public class App {
         } else if (userInput == currentUser.getUser().getId()) {
             System.out.println("Cannot request from yourself.");
         } else {
-            //this block could be omitted
             int fromId = 0;
             for (User user : users) {
                 if (userInput == user.getId()) {
@@ -293,12 +324,30 @@ public class App {
         System.out.println("--------------------------------------------\n" +
                 "Transfer Details\n" +
                 "--------------------------------------------");
+
+        String accountToUsername = tenmoServices.getUserByUserId(currentUser,
+                tenmoServices.getAccountByAccountId(currentUser, transfer.getAccountTo()).getUserId()).getUsername();
+
+        String accountFromUsername = tenmoServices.getUserByUserId(currentUser,
+                tenmoServices.getAccountByAccountId(currentUser, transfer.getAccountFrom()).getUserId()).getUsername();
+
         System.out.println("Id: " + transfer.getTransferId());
-        System.out.println("From: " + transfer.getAccountFrom());
-        System.out.println("To: " + transfer.getAccountTo());
-        System.out.println("Type: " + transfer.getTransferTypeId());
-        System.out.println("Status: " + transfer.getTransferStatusId());
+        System.out.println("From: " + accountFromUsername);
+        System.out.println("To: " + accountToUsername);
+        System.out.println("Type: " + getTransferType(transfer.getTransferTypeId()));
+        System.out.println("Status: " + getTransferStatus(transfer.getTransferStatusId()));
         System.out.println("Amount: " + transfer.getAmount());
+    }
+
+
+    public TransferType getTransferType(int type){
+        return (type == 1)? TransferType.Request : TransferType.Send;
+    }
+
+    public TransferStatus getTransferStatus(int status){
+        if(status == 1) return TransferStatus.Pending;
+        else if (status ==2) return TransferStatus.Approved;
+        else return TransferStatus.Rejected;
     }
 
 }

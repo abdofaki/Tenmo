@@ -111,6 +111,17 @@ public class TenmoServices {
         return transferList;
     }
 
+    public Transfer[] getPendingTransfers(AuthenticatedUser authenticatedUser, int accountId) {
+        Transfer[] pendingTransfers = null;
+        try {
+            ResponseEntity<Transfer[]> response = restTemplate.exchange(baseUrl + "/pending/" +accountId, HttpMethod.GET, makeAuthEntity(authenticatedUser), Transfer[].class);
+            pendingTransfers = response.getBody();
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log((e.getMessage()));
+        }
+        return pendingTransfers;
+    }
+
 
     public Transfer getTransferById(AuthenticatedUser authenticatedUser, int transferId){
         Transfer transfer = null;
@@ -123,6 +134,7 @@ public class TenmoServices {
         }
         return transfer;
     }
+
 
 
 
