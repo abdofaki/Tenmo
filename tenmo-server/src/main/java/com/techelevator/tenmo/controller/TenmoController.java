@@ -60,11 +60,16 @@ public class TenmoController {
     public Transfer viewTransferByID(@PathVariable("id") Long id){
         return transferDao.getTransferByID(id);
     }
+
     @RequestMapping(path = "/transfers/history/{id}", method = RequestMethod.GET)
     public List<Transfer> viewTransferHistory(@PathVariable("id") Long accountId){
         return transferDao.getTransferByAccount(accountId);
     }
 
+    @RequestMapping(path = "/request", method = RequestMethod.POST)
+    public void request(@RequestBody Transfer transfer) {
+        transferDao.request(transfer);
+    }
 
 
 

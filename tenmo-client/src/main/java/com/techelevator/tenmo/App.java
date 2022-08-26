@@ -35,6 +35,7 @@ public class App {
             mainMenu();
         }
     }
+
     private void loginMenu() {
         int menuSelection = -1;
         while (menuSelection != 0 && currentUser == null) {
@@ -95,18 +96,18 @@ public class App {
         }
     }
 
-	private void viewCurrentBalance() {
-		// TODO Auto-generated method stub
+    private void viewCurrentBalance() {
+        // TODO Auto-generated method stub
 //        BigDecimal balance = userService.getBalance(currentUser);
 //        System.out.println(balance);
 
         Balance balance = tenmoServices.getBalance(currentUser);
         System.out.println("Your current account balance is: $" + balance.getBalance());
-		
-	}
 
-	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
+    }
+
+    private void viewTransferHistory() {
+        // TODO Auto-generated method stub
 
         Account userAccount = tenmoServices.getAccountByUserId(currentUser, currentUser.getUser().getId());
         int userAccountId = userAccount.getAccountId();
@@ -118,8 +119,7 @@ public class App {
         System.out.println("ID               From/To             Amount");
         System.out.println("-------------------------------------------");
 
-        if (transfers != null)
-        {
+        if (transfers != null) {
             for (Transfer transfer : transfers) {
                 if (transfer.getAccountFrom() == userAccountId) {
                     String username = tenmoServices.getUserByUserId(currentUser,
@@ -136,42 +136,32 @@ public class App {
                 }
             }
 
-            int userInput =  consoleService.promptForInt("Enter the ID of the transfer you'd like to view: (enter 0 to cancel): ");
-            while (userInput != 0){
+            int userInput = consoleService.promptForInt("Enter the ID of the transfer you'd like to view: (enter 0 to cancel): ");
+            while (userInput != 0) {
 
                 Transfer transfer = tenmoServices.getTransferById(currentUser, userInput);
-                if (transfer != null){
-
-
-                    System.out.println(transfer);
+                if (transfer != null) {
+                    printTransferDetails(transfer);
                     break;
-                }
-                else{
+                } else {
                     userInput = consoleService.promptForInt("Invalid ID\n " +
                             "Please enter the VALID ID of the transfer you'd like to view: (enter 0 to cancel): ");
                 }
             }
-        }
-
-
-        else {
+        } else {
             System.out.println("No Transfer History");
         }
 
 
+    }
 
+    private void viewPendingRequests() {
+        // TODO Auto-generated method stub
 
+    }
 
-        
-	}
-
-	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void sendBucks() {
-		// TODO Auto-generated method stub
+    private void sendBucks() {
+        // TODO Auto-generated method stub
 
         User[] users = tenmoServices.getAllUsers(currentUser);
         printUsers(users);
@@ -204,8 +194,8 @@ public class App {
             System.out.println("Your new balance is: $" + checkBalance(newBalance));
 
         }
-		
-	}
+
+    }
 
 
     private Transfer createTransfer(int status, int type, int UserId, BigDecimal transferAmount) {
@@ -214,10 +204,15 @@ public class App {
         transfer.setTransferTypeId(type);
 
         Account fromAccount = tenmoServices.getAccountByUserId(currentUser, UserId);
-        Account toAccount = tenmoServices.getAccountByUserId(currentUser,(currentUser.getUser().getId()));
+        Account toAccount = tenmoServices.getAccountByUserId(currentUser, (currentUser.getUser().getId()));
+
+        if (type == 1) {
+            fromAccount = tenmoServices.getAccountByUserId(currentUser, UserId);
+            toAccount = tenmoServices.getAccountByUserId(currentUser, (currentUser.getUser().getId()));
+        }
 
         if (type == 2) {
-            fromAccount = tenmoServices.getAccountByUserId(currentUser,(currentUser.getUser().getId()));
+            fromAccount = tenmoServices.getAccountByUserId(currentUser, (currentUser.getUser().getId()));
             toAccount = tenmoServices.getAccountByUserId(currentUser, UserId);
         }
         transfer.setAccountFrom(fromAccount.getAccountId());
@@ -225,7 +220,6 @@ public class App {
         transfer.setAmount(transferAmount);
         return transfer;
     }
-
 
     private void printUsers(User[] users) {
         System.out.println("Choose from the following users: ");
@@ -245,12 +239,66 @@ public class App {
         return balance;
     }
 
-	private void requestBucks() {
-		// TODO Auto-generated method stub
-		
-	}
+    private void requestBucks() {
+        // TODO Auto-generated method stub
+        User[] users = tenmoServices.getAllUsers(currentUser);
+        printUsers1(users);
 
+        //prompting user to enter an user id to request from
+        int userInput = consoleService.promptForInt("Enter ID of user you are requesting from (0 to cancel): ");
 
+        if (userInput == 0) {
+            System.out.println("Transaction cancelled.");
+        } else if (userInput == currentUser.getUser().getId()) {
+            System.out.println("Cannot request from yourself.");
+        } else {
+            //this block could be omitted
+            int fromId = 0;
+            for (User user : users) {
+                if (userInput == user.getId()) {
+                    fromId = userInput;
+                    break;
+                }
+            }
 
+            BigDecimal transferAmount = consoleService.promptForBigDecimal("Enter request amount: ");
+            while (transferAmount.compareTo(BigDecimal.ZERO) <= 0) {
+                transferAmount = consoleService.promptForBigDecimal("Request amount must be greater than zero. Enter request amount: ");
+            }
+
+            Transfer transfer = createTransfer(1, 1, fromId, transferAmount);
+            tenmoServices.request(currentUser, transfer);
+
+            System.out.println("Request sent successfully");
+        }
+    }
+
+    private void printUsers1(User[] users) {
+        System.out.println("-------------------------------------------\n" +
+                "Users\n" +
+                "ID          Name\n" +
+                "-------------------------------------------");
+
+        for (User user : users) {
+            //ignoring the logged in user from displaying
+            if (user.getUsername().equals(currentUser.getUser().getUsername())) continue;
+
+            //printing the remaining users
+            System.out.println(user.getId() + "\t\t" + user.getUsername());
+        }
+        System.out.println("-------------------------------------------");
+    }
+
+    private void printTransferDetails(Transfer transfer){
+        System.out.println("--------------------------------------------\n" +
+                "Transfer Details\n" +
+                "--------------------------------------------");
+        System.out.println("Id: " + transfer.getTransferId());
+        System.out.println("From: " + transfer.getAccountFrom());
+        System.out.println("To: " + transfer.getAccountTo());
+        System.out.println("Type: " + transfer.getTransferTypeId());
+        System.out.println("Status: " + transfer.getTransferStatusId());
+        System.out.println("Amount: " + transfer.getAmount());
+    }
 
 }

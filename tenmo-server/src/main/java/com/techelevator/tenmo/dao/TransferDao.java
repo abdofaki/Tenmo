@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface TransferDao {
 
+    void request (Transfer transfer);
     void transfer (Transfer transfer);
     Transfer getTransferByID(Long transferId);
     List<Transfer> getTransferByAccount(Long accountId);

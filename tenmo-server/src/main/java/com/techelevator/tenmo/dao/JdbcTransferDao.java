@@ -78,6 +78,28 @@ public class JdbcTransferDao implements TransferDao{
                 transfer.getTransferTypeId(), transfer.getTransferStatusId(), fromAccountId, toAccountId, transferAmount);
    }
 
+    @Override
+    public void request(Transfer transfer) {
+        int transferTypeId = transfer.getTransferTypeId();
+        int transferStatusId = transfer.getTransferStatusId();
+
+        AccountDao accountDao = new JdbcAccountDao(jdbcTemplate);
+        int fromAccountId = transfer.getAccountFrom();
+        int toAccountId = transfer.getAccountTo();
+        Account fromAccount = accountDao.getAccountWithAccountId((long) fromAccountId);
+        Account toAccount = accountDao.getAccountWithAccountId((long) toAccountId);
+        fromAccountId = fromAccount.getAccountId();
+        toAccountId = toAccount.getAccountId();
+
+        BigDecimal requestAmount = transfer.getAmount();
+
+        String sql = "START TRANSACTION; " +
+                "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
+                " VALUES (?, ?, ?, ?, ?);" +
+                "COMMIT;";
+
+        jdbcTemplate.update(sql, transferTypeId, transferStatusId, fromAccountId, toAccountId, requestAmount);
+    }
 
 
 

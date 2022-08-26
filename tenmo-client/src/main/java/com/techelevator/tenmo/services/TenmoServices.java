@@ -43,6 +43,14 @@ public class TenmoServices {
         }
     }
 
+    public void request(AuthenticatedUser authenticatedUser, Transfer transfer) {
+        try {
+            restTemplate.exchange(baseUrl + "/request", HttpMethod.POST, makeTransferAuthEntity(authenticatedUser, transfer), Transfer.class);
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+    }
+
 
     public User[] getAllUsers(AuthenticatedUser authenticatedUser) {
         User[] users = null;
