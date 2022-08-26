@@ -17,6 +17,7 @@ public class App {
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
     private final UserServices userService = new UserServices(API_BASE_URL);
     private final TenmoServices tenmoServices = new TenmoServices();
+    //private Transfer transfer;
 
 
     private AuthenticatedUser currentUser;
@@ -106,15 +107,42 @@ public class App {
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
-        Transfer[] transferList = tenmoServices.getTransferHistory(currentUser);
-        if (transferList != null) {
-            for (Transfer transfer : transferList) {
-                System.out.println(transfer.toString());
+
+        Account userAccount = tenmoServices.getAccountByUserId(currentUser, currentUser.getUser().getId());
+        int userAccountId = userAccount.getAccountId();
+        Transfer[] transfers = tenmoServices.getTransferHistory(currentUser, userAccountId);
+
+
+        System.out.println("-------------------------------------------");
+        System.out.println("Transfers");
+        System.out.println("ID               From/To             Amount");
+        System.out.println("-------------------------------------------");
+
+        if (transfers != null)
+        {
+            for (Transfer transfer : transfers) {
+                if (transfer.getAccountFrom() == userAccountId) {
+                    String username = tenmoServices.getUserByUserId(currentUser,
+                            tenmoServices.getAccountByAccountId(currentUser, transfer.getAccountTo()).getUserId()).getUsername();
+
+                    System.out.println(transfer.getTransferId() + "\t\t\t" + "To:" + username + "             $" + transfer.getAmount());
+
+                }
+                if (transfer.getAccountTo() == userAccountId) {
+                    String username = tenmoServices.getUserByUserId(currentUser,
+                            tenmoServices.getAccountByAccountId(currentUser, transfer.getAccountFrom()).getUserId()).getUsername();
+                    System.out.println(transfer.getTransferId() + "\t\t\t" + "From:" + username + "           $" + transfer.getAmount());
+
+                }
             }
+
             int userInput =  consoleService.promptForInt("Enter the ID of the transfer you'd like to view: (enter 0 to cancel): ");
             while (userInput != 0){
+
                 Transfer transfer = tenmoServices.getTransferById(currentUser, userInput);
                 if (transfer != null){
+
+
                     System.out.println(transfer);
                     break;
                 }
@@ -123,9 +151,14 @@ public class App {
                             "Please enter the VALID ID of the transfer you'd like to view: (enter 0 to cancel): ");
                 }
             }
-        } else{
+        }
+
+
+        else {
             System.out.println("No Transfer History");
         }
+
+
 
 
 

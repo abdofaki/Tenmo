@@ -65,16 +65,45 @@ public class TenmoServices {
         }
         return account;
     }
-    public Transfer[] getTransferHistory(AuthenticatedUser authenticatedUser){
+
+    public User getUserByUserId(AuthenticatedUser authenticatedUser, int userId) {
+        User user = null;
+        try {
+            ResponseEntity<User> response = restTemplate.exchange(baseUrl + "/users/" + userId, HttpMethod.GET, makeAuthEntity(authenticatedUser), User.class);
+            user = response.getBody();
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return user;
+    }
+
+
+    public Account getAccountByAccountId(AuthenticatedUser authenticatedUser, int accountId) {
+        Account account = null;
+        try {
+            ResponseEntity<Account> response = restTemplate.exchange(baseUrl + "/account/" + accountId, HttpMethod.GET, makeAuthEntity(authenticatedUser), Account.class);
+            account = response.getBody();
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return account;
+    }
+
+
+
+
+    public Transfer[] getTransferHistory(AuthenticatedUser authenticatedUser,int accountId){
         Transfer[] transferList = null;
         try {
-            ResponseEntity<Transfer[]> response = restTemplate.exchange(baseUrl + "/transfers", HttpMethod.GET, makeAuthEntity(authenticatedUser), Transfer[].class);
+            ResponseEntity<Transfer[]> response = restTemplate.exchange(baseUrl + "/transfers/history/"+accountId, HttpMethod.GET, makeAuthEntity(authenticatedUser), Transfer[].class);
             transferList = response.getBody();
         } catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());
         }
         return transferList;
     }
+
+
     public Transfer getTransferById(AuthenticatedUser authenticatedUser, int transferId){
         Transfer transfer = null;
         try {
@@ -86,6 +115,10 @@ public class TenmoServices {
         }
         return transfer;
     }
+
+
+
+
 
 
 

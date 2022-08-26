@@ -9,7 +9,7 @@ public interface TransferDao {
 
     void transfer (Transfer transfer);
     Transfer getTransferByID(Long transferId);
-    List<Transfer> getTransferByAccount();
+    List<Transfer> getTransferByAccount(Long accountId);
 
 
 

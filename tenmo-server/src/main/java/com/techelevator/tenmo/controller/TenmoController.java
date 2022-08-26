@@ -41,6 +41,15 @@ public class TenmoController {
         return accountDao.getAccountWithUserId(id);
     }
 
+    @RequestMapping(path = "/account/{id}", method = RequestMethod.GET)
+    public Account getAccountByAccountId(@PathVariable long id) {
+        return accountDao.getAccountWithAccountId(id);
+    }
+
+    @RequestMapping(path = "/users/{id}", method = RequestMethod.GET)
+    public User getUserByUserId(@PathVariable long id) {
+        return userDao.findByUserID(id);
+    }
 
     @RequestMapping(path = "/transfer", method = RequestMethod.POST)
     public void transfer(@RequestBody Transfer transfer) {
@@ -48,11 +57,15 @@ public class TenmoController {
     }
 
     @RequestMapping(path = "/transfers/{id}", method = RequestMethod.GET)
-    public Transfer viewTransferByID(@PathVariable long id){
+    public Transfer viewTransferByID(@PathVariable("id") Long id){
         return transferDao.getTransferByID(id);
     }
-    @RequestMapping(path = "/transfers", method = RequestMethod.GET)
-    public List<Transfer> viewTransferHistory(){return transferDao.getTransferByAccount();
+    @RequestMapping(path = "/transfers/history/{id}", method = RequestMethod.GET)
+    public List<Transfer> viewTransferHistory(@PathVariable("id") Long accountId){
+        return transferDao.getTransferByAccount(accountId);
     }
+
+
+
 
 }
