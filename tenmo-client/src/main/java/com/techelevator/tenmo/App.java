@@ -121,29 +121,34 @@ public class App {
     private void viewTransferHistory() {
         // TODO Auto-generated method stub
 
+
+
+
         Account userAccount = tenmoServices.getAccountByUserId(currentUser, currentUser.getUser().getId());
         int userAccountId = userAccount.getAccountId();
         Transfer[] transfers = tenmoServices.getTransferHistory(currentUser, userAccountId);
 
-
         System.out.println("-------------------------------------------");
         System.out.println("Transfers");
-        System.out.println("ID               From/To             Amount");
-        System.out.println("-------------------------------------------");
+        System.out.printf("%-22s%-22s%-22s\n","ID"," From/To  ","Amount");
+        System.out.println("--------------------------------------------------");
 
         if (transfers != null) {
             for (Transfer transfer : transfers) {
                 if (transfer.getAccountFrom() == userAccountId) {
                     String username = tenmoServices.getUserByUserId(currentUser,
                             tenmoServices.getAccountByAccountId(currentUser, transfer.getAccountTo()).getUserId()).getUsername();
+                    String to = "To:";
+                    System.out.printf("%-22d%-22s%-22s\n",transfer.getTransferId(),to+username,transfer.getAmount());
 
-                    System.out.println(transfer.getTransferId() + "\t\t\t" + "To:" + username + "             $" + transfer.getAmount());
 
                 }
                 if (transfer.getAccountTo() == userAccountId) {
                     String username = tenmoServices.getUserByUserId(currentUser,
                             tenmoServices.getAccountByAccountId(currentUser, transfer.getAccountFrom()).getUserId()).getUsername();
-                    System.out.println(transfer.getTransferId() + "\t\t\t" + "From:" + username + "           $" + transfer.getAmount());
+                    String from = "From:";
+                    System.out.printf("%-22d%-22s%-22s\n",transfer.getTransferId(),from+username,transfer.getAmount());
+
 
                 }
             }
@@ -182,7 +187,9 @@ public class App {
 
                 String userName = tenmoServices.getUserByUserId(currentUser,
                         tenmoServices.getAccountByAccountId(currentUser, pending.getAccountFrom()).getUserId()).getUsername();
-                System.out.println( pending.getTransferId() + "\t\t" + userName + "\t\t" + pending.getAmount());
+                //System.out.println( pending.getTransferId() + "\t\t" + userName + "\t\t" + pending.getAmount());
+
+                System.out.printf("%-22d%-22s%-22s\n",pending.getTransferId(),userName,pending.getAmount());
             }
 
             System.out.println("---------\n" +
