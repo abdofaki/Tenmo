@@ -41,9 +41,9 @@ public class JdbcTransferDao implements TransferDao {
     public List<Transfer> getPendingRequestByAccount(Long accountId) {
         List<Transfer> pendingTransfers = new ArrayList<>();
         String sql =
-                "SELECT transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount " +
+                "SELECT * " +
                         "FROM transfer " +
-                        "WHERE account_to = ? " +
+                        "WHERE account_from = ? " +
                         "AND transfer_status_id = 1";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
         while (results.next()) {
@@ -56,7 +56,7 @@ public class JdbcTransferDao implements TransferDao {
     @Override
     public Transfer getTransferByID(Long transferId) {
         Transfer transfer = null;
-        String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount " +
+        String sql = "SELECT * " +
                 " FROM transfer " +
                 " WHERE transfer_id = ?; ";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, transferId);
@@ -72,66 +72,105 @@ public class JdbcTransferDao implements TransferDao {
     public void transfer(Transfer transfer) {
         boolean approved = transfer.getTransferStatusId() == 2;
         AccountDao accountDao = new JdbcAccountDao(jdbcTemplate);
-        int fromAccountId = transfer.getAccountFrom();
-        int toAccountId = transfer.getAccountTo();
+        Long fromAccountId = transfer.getAccountFrom();
+        Long toAccountId = transfer.getAccountTo();
+        String sql;
         Account fromAccount = accountDao.getAccountWithAccountId((long) fromAccountId);
         Account toAccount = accountDao.getAccountWithAccountId((long) toAccountId);
-        BigDecimal fromAccountBalance = fromAccount.getBalance().getBalance();
-        BigDecimal toAccountBalance = toAccount.getBalance().getBalance();
+        BigDecimal fromAccountBalance = fromAccount.getBalance();
+        BigDecimal toAccountBalance = toAccount.getBalance();
         BigDecimal transferAmount = transfer.getAmount();
         if (approved) {
             fromAccountBalance = fromAccountBalance.subtract(transferAmount);
             toAccountBalance = toAccountBalance.add(transferAmount);
         }
-        String sql = "START TRANSACTION; " +
-                "UPDATE account " +
-                "SET balance = ? " +
-                "WHERE account_id = ?; " +
-                "UPDATE account " +
-                "SET balance = ? " +
-                "WHERE account_id = ?; " +
-                "INSERT INTO transfer (transfer_type_id, transfer_status_id,account_from, account_to, amount) " +
-                " VALUES (?, ?, ?, ?, ?);" +
-                "COMMIT;";
+            sql = "START TRANSACTION; " +
+                    "UPDATE account " +
+                    "SET balance = ? " +
+                    "WHERE account_id = ?; " +
+                    "UPDATE account " +
+                    "SET balance = ? " +
+                    "WHERE account_id = ?; " +
+                    "INSERT INTO transfer (transfer_type_id, transfer_status_id,account_from, account_to, amount) " +
+                    " VALUES (?, ?, ?, ?, ?);" +
+                    "COMMIT;";
+            jdbcTemplate.update(sql, fromAccountBalance, fromAccountId, toAccountBalance, toAccountId,
+                    transfer.getTransferTypeId(), transfer.getTransferStatusId(), fromAccountId, toAccountId, transferAmount);
 
-        jdbcTemplate.update(sql, fromAccountBalance, fromAccountId, toAccountBalance, toAccountId,
-                transfer.getTransferTypeId(), transfer.getTransferStatusId(), fromAccountId, toAccountId, transferAmount);
+
+
     }
-
     @Override
-    public void request(Transfer transfer) {
-        int transferTypeId = transfer.getTransferTypeId();
-        int transferStatusId = transfer.getTransferStatusId();
-
+    public void pendingTransfer(Transfer transfer) {
         AccountDao accountDao = new JdbcAccountDao(jdbcTemplate);
-        int fromAccountId = transfer.getAccountFrom();
-        int toAccountId = transfer.getAccountTo();
-        Account fromAccount = accountDao.getAccountWithAccountId((long) fromAccountId);
-        Account toAccount = accountDao.getAccountWithAccountId((long) toAccountId);
-        fromAccountId = (int) fromAccount.getAccountId();
-        toAccountId = (int) toAccount.getAccountId();
-
-        BigDecimal requestAmount = transfer.getAmount();
-
-        String sql = "START TRANSACTION; " +
-                "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                " VALUES (?, ?, ?, ?, ?);" +
+        Long fromAccountId = transfer.getAccountFrom();
+        Long toAccountId = transfer.getAccountTo();
+        String sql;
+        Account fromAccount = accountDao.getAccountWithAccountId(fromAccountId);
+        Account toAccount = accountDao.getAccountWithAccountId(toAccountId);
+        BigDecimal fromAccountBalance = fromAccount.getBalance();
+        BigDecimal toAccountBalance = toAccount.getBalance();
+        BigDecimal transferAmount = transfer.getAmount();
+        fromAccountBalance = fromAccountBalance.subtract(transferAmount);
+        toAccountBalance = toAccountBalance.add(transferAmount);
+        sql = "START TRANSACTION; " +
+                "UPDATE account " +
+                "SET balance = ? " +
+                "WHERE account_id = ?; " +
+                "UPDATE account " +
+                "SET balance = ? " +
+                "WHERE account_id = ?; " +
+                "UPDATE transfer " +
+                "SET transfer_status_id = 2" +
+                "WHERE transfer_id = ?;" +
                 "COMMIT;";
+        jdbcTemplate.update(sql, fromAccountBalance, fromAccountId, toAccountBalance, toAccountId,
+                transfer.getTransferId());
 
-        jdbcTemplate.update(sql, transferTypeId, transferStatusId, fromAccountId, toAccountId, requestAmount);
-    }
+        }
+
+        public void pendingReject(Transfer transfer){
+        String sql = "START TRANSACTION; " +
+                "UPDATE transfer " +
+                "SET transfer_status_id = 3" +
+                "WHERE transfer_id = ?;" +
+                "COMMIT;";
+        jdbcTemplate.update(sql, transfer.getTransferId());
+        }
+        @Override
+        public void request (Transfer transfer){
+            Long transferTypeId = transfer.getTransferTypeId();
+            Long transferStatusId = transfer.getTransferStatusId();
+
+            AccountDao accountDao = new JdbcAccountDao(jdbcTemplate);
+            Long fromAccountId = transfer.getAccountFrom();
+            Long toAccountId = transfer.getAccountTo();
+            Account fromAccount = accountDao.getAccountWithAccountId(fromAccountId);
+            Account toAccount = accountDao.getAccountWithAccountId((toAccountId));
+            fromAccountId = fromAccount.getAccountId();
+            toAccountId = toAccount.getAccountId();
+
+            BigDecimal requestAmount = transfer.getAmount();
+
+            String sql = "START TRANSACTION; " +
+                    "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
+                    " VALUES (?, ?, ?, ?, ?);" +
+                    "COMMIT;";
+
+            jdbcTemplate.update(sql, transferTypeId, transferStatusId, fromAccountId, toAccountId, requestAmount);
+        }
+
 
 
     private Transfer mapRowToTransfer(SqlRowSet results) {
 
         Transfer transfer = new Transfer();
-        transfer.setTransferId(results.getInt("transfer_id"));
-        transfer.setTransferTypeId(results.getInt("transfer_type_id"));
-        transfer.setTransferStatusId(results.getInt("transfer_status_id"));
-        transfer.setAccountFrom(results.getInt("account_from"));
-        transfer.setAccountTo(results.getInt("account_to"));
-        String stringAmount = results.getString("amount");
-        transfer.setAmount(new BigDecimal(stringAmount));
+        transfer.setTransferId(results.getLong("transfer_id"));
+        transfer.setTransferTypeId(results.getLong("transfer_type_id"));
+        transfer.setTransferStatusId(results.getLong("transfer_status_id"));
+        transfer.setAccountFrom(results.getLong("account_from"));
+        transfer.setAccountTo(results.getLong("account_to"));
+        transfer.setAmount(results.getBigDecimal("amount"));
         return transfer;
     }
 }

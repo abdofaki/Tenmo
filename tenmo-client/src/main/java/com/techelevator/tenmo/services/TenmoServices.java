@@ -7,6 +7,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +24,10 @@ public class TenmoServices {
     }
 
 
-    public Balance getBalance(AuthenticatedUser authenticatedUser) {
-        Balance balance = null;
+    public BigDecimal getBalance(AuthenticatedUser authenticatedUser) {
+        BigDecimal balance = null;
         try {
-            ResponseEntity<Balance> response = restTemplate.exchange(baseUrl + "/balance", HttpMethod.GET, makeAuthEntity(authenticatedUser), Balance.class);
+            ResponseEntity<BigDecimal> response = restTemplate.exchange(baseUrl + "/balance", HttpMethod.GET, makeAuthEntity(authenticatedUser), BigDecimal.class);
             balance = response.getBody();
         } catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());
@@ -46,6 +47,20 @@ public class TenmoServices {
     public void request(AuthenticatedUser authenticatedUser, Transfer transfer) {
         try {
             restTemplate.exchange(baseUrl + "/request", HttpMethod.POST, makeTransferAuthEntity(authenticatedUser, transfer), Transfer.class);
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+    }
+    public void pendingTransfer(AuthenticatedUser authenticatedUser, Transfer transfer){
+        try {
+            restTemplate.exchange(baseUrl + "/request/approve", HttpMethod.PUT, makeTransferAuthEntity(authenticatedUser, transfer), Transfer.class);
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+    }
+    public void pendingReject(AuthenticatedUser authenticatedUser, Transfer transfer){
+        try {
+            restTemplate.exchange(baseUrl + "/request/reject", HttpMethod.PUT, makeTransferAuthEntity(authenticatedUser, transfer), Transfer.class);
         } catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());
         }

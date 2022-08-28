@@ -21,35 +21,7 @@ public class UserServices {
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
     }
-    public BigDecimal getBalance(AuthenticatedUser currentUser){
-        BigDecimal balance = null;
-        try {
-            ResponseEntity<BigDecimal> response =
-                    restTemplate.exchange(API_BASE_URL + "/user/balance/", HttpMethod.GET, makeAuthEntity(currentUser), BigDecimal.class);
-            balance = response.getBody();
 
-        } catch (RestClientResponseException | ResourceAccessException e) {
-            BasicLogger.log(e.getMessage());
-        }
-        return balance;
-    };
-    public List<Transfer> getAllTransfers(AuthenticatedUser currentUser){
-        List transferList = new ArrayList<>();
-        try {
-            ResponseEntity<List> response =
-                    restTemplate.exchange(API_BASE_URL + "/user/transfers", HttpMethod.GET, makeAuthEntity(currentUser), List.class);
-            transferList = response.getBody();
-        }catch (RestClientResponseException | ResourceAccessException e) {
-            BasicLogger.log(e.getMessage());
-        }
-        return transferList;
-    }
-    private HttpEntity<User> makeUserEntity(User user) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(authToken);
-        return new HttpEntity<>(user, headers);
-    }
     private HttpEntity<Void> makeAuthEntity(AuthenticatedUser currentUser) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(currentUser.getToken());

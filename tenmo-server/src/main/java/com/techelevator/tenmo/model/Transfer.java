@@ -4,50 +4,50 @@ import java.math.BigDecimal;
 
 public class Transfer {
 
-    private int transferId;
-    private int transferTypeId;
-    private int transferStatusId;
-    private int accountFrom;
-    private int accountTo;
+    private Long transferId;
+    private Long transferTypeId;
+    private Long transferStatusId;
+    private Long accountFrom;
+    private Long accountTo;
     private BigDecimal amount;
 
-    public int getTransferId() {
+    public Long getTransferId() {
         return transferId;
     }
 
-    public void setTransferId(int transferId) {
+    public void setTransferId(Long transferId) {
         this.transferId = transferId;
     }
 
-    public int getTransferTypeId() {
+    public Long getTransferTypeId() {
         return transferTypeId;
     }
 
-    public void setTransferTypeId(int transferTypeId) {
+    public void setTransferTypeId(Long transferTypeId) {
         this.transferTypeId = transferTypeId;
     }
 
-    public int getTransferStatusId() {
+    public Long getTransferStatusId() {
         return transferStatusId;
     }
 
-    public void setTransferStatusId(int transferStatusId) {
+    public void setTransferStatusId(Long transferStatusId) {
         this.transferStatusId = transferStatusId;
     }
 
-    public int getAccountFrom() {
+    public Long getAccountFrom() {
         return accountFrom;
     }
 
-    public void setAccountFrom(int accountFrom) {
+    public void setAccountFrom(Long accountFrom) {
         this.accountFrom = accountFrom;
     }
 
-    public int getAccountTo() {
+    public Long getAccountTo() {
         return accountTo;
     }
 
-    public void setAccountTo(int accountTo) {
+    public void setAccountTo(Long accountTo) {
         this.accountTo = accountTo;
     }
 

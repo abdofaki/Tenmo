@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class TenmoController {
     }
 
     @RequestMapping(path = "/balance", method = RequestMethod.GET)
-    public Balance getBalance(Principal principal) {
+    public BigDecimal getBalance(Principal principal) {
         return accountDao.getBalance(principal.getName());
     }
 
@@ -75,7 +76,14 @@ public class TenmoController {
     public void request(@RequestBody Transfer transfer) {
         transferDao.request(transfer);
     }
-
+    @RequestMapping(path = "/request/approve", method = RequestMethod.PUT)
+    public void pendingTransfer(@RequestBody Transfer transfer){
+        transferDao.pendingTransfer(transfer);
+    }
+    @RequestMapping(path = "/request/reject", method = RequestMethod.PUT)
+    public void pendingReject(@RequestBody Transfer transfer){
+        transferDao.pendingReject(transfer);
+    }
 
 
 }
