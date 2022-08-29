@@ -254,19 +254,20 @@ public class App {
             }
 
             BigDecimal transferAmount = consoleService.promptForBigDecimal("Enter amount to send: ");
-            while (transferAmount.compareTo(BigDecimal.ZERO) <= 0) {
-                transferAmount = consoleService.promptForBigDecimal("Transfer amount must be more than 0. Enter amount to transfer: ");
-            }
-            while (transferAmount.compareTo(tenmoServices.getBalance(currentUser)) > 0) {
-                transferAmount = consoleService.promptForBigDecimal("Transfer amount cannot be more than user balance. Enter amount to transfer: ");
+            while (transferAmount.compareTo(BigDecimal.ZERO) <= 0.00 ||
+                    transferAmount.compareTo(tenmoServices.getBalance(currentUser)) > 0) {
+                if (transferAmount.compareTo(BigDecimal.ZERO) <= 0.00) {
+                    transferAmount = consoleService.promptForBigDecimal("Transfer amount must be more than 0. Enter amount to transfer: ");
+                } else if (transferAmount.compareTo(tenmoServices.getBalance(currentUser)) > 0) {
+                    transferAmount = consoleService.promptForBigDecimal("Transfer amount cannot be more than user balance. Enter amount to transfer: ");
+                }
             }
             Transfer transfer = createTransfer(2, 2, toId, transferAmount);
             tenmoServices.transfer(currentUser, transfer);
 
             BigDecimal newBalance = tenmoServices.getBalance(currentUser);
-            checkBalance(newBalance);
             System.out.println("Successfully sent: $" + transferAmount);
-            System.out.println("Your new balance is: $" + checkBalance(newBalance));
+            System.out.println("Your new balance is: $" + newBalance);
 
         }
 

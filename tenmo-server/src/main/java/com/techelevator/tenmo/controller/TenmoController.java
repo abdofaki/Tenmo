@@ -71,7 +71,6 @@ public class TenmoController {
     public List<Transfer> getPendingTransfers(@PathVariable("id") Long accountId){
         return transferDao.getPendingRequestByAccount(accountId);
     }
-
     @RequestMapping(path = "/request", method = RequestMethod.POST)
     public void request(@RequestBody Transfer transfer) {
         transferDao.request(transfer);
