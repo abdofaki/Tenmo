@@ -129,7 +129,7 @@ public class TenmoServices {
     public Transfer[] getPendingTransfers(AuthenticatedUser authenticatedUser, int accountId) {
         Transfer[] pendingTransfers = null;
         try {
-            ResponseEntity<Transfer[]> response = restTemplate.exchange(baseUrl + "/pending/" +accountId, HttpMethod.GET, makeAuthEntity(authenticatedUser), Transfer[].class);
+            ResponseEntity<Transfer[]> response = restTemplate.exchange(baseUrl + "/pending/" + accountId, HttpMethod.GET, makeAuthEntity(authenticatedUser), Transfer[].class);
             pendingTransfers = response.getBody();
         } catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log((e.getMessage()));
@@ -149,14 +149,6 @@ public class TenmoServices {
         }
         return transfer;
     }
-
-
-
-
-
-
-
-
     private HttpEntity makeAuthEntity(AuthenticatedUser authenticatedUser) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authenticatedUser.getToken());
@@ -171,7 +163,4 @@ public class TenmoServices {
         HttpEntity<Transfer> entity = new HttpEntity(transfer, headers);
         return entity;
     }
-
-
-
 }

@@ -41,7 +41,7 @@ public class JdbcTransferDao implements TransferDao {
     public List<Transfer> getPendingRequestByAccount(Long accountId) {
         List<Transfer> pendingTransfers = new ArrayList<>();
         String sql =
-                "SELECT * " +
+                        "SELECT * " +
                         "FROM transfer " +
                         "WHERE account_from = ? " +
                         "AND transfer_status_id = 1";

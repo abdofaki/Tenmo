@@ -9,3 +9,8 @@
 2022-08-29T11:18:22.8464115 401 : [no body]
 2022-08-29T11:19:49.5698413 500 : [{"timestamp":"2022-08-29T18:19:49.557+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [START TRANSACTION; UPDATE account SET balance = ? WHERE account_id ... (785 bytes)]
 2022-08-29T11:19:49.5808111 500 : [{"timestamp":"2022-08-29T18:19:49.579+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; uncategorized SQLException for SQL [SELECT balance FROM account JOIN ten... (571 bytes)]
+2022-08-29T11:39:44.0813215 500 : [{"timestamp":"2022-08-29T18:39:44.069+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [START TRANSACTION; UPDATE account SET balance = ? WHERE account_id ... (785 bytes)]
+2022-08-29T11:39:44.091295 500 : [{"timestamp":"2022-08-29T18:39:44.090+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; uncategorized SQLException for SQL [SELECT balance FROM account JOIN ten... (571 bytes)]
+2022-08-29T23:27:13.6512717 500 : [{"timestamp":"2022-08-30T06:27:13.634+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [START TRANSACTION; UPDATE account SET balance = ? WHERE account_id ... (785 bytes)]
+2022-08-29T23:27:13.662242 500 : [{"timestamp":"2022-08-30T06:27:13.660+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; uncategorized SQLException for SQL [SELECT balance FROM account JOIN ten... (571 bytes)]
+2022-08-29T23:54:47.1545992 401 : [no body]
